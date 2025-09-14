@@ -13,4 +13,7 @@ realiza un movimiento corto:
 - `L` &rarr; giro a la izquierda.
 - `R` &rarr; giro a la derecha.
 
+- `M` &rarr; activa/desactiva el modo automático de evasión de obstáculos usando un
+  sensor ultrasónico montado sobre un servo.
+
 Cualquier otro carácter detiene el carrito.
