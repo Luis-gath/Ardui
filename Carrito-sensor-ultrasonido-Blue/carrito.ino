@@ -16,6 +16,7 @@ const int SERVO_PIN = 10;
 
 // Configuración de movimiento
 const int vel = 200;    // velocidad PWM 0-255
+const int velAuto = 135; // velocidad en modo automático
 const int tPaso = 200;  // duración de un paso hacia adelante o atrás (ms)
 const int tGiro = 150;  // duración de un giro sobre su eje (ms)
 
@@ -112,6 +113,16 @@ void pasoDer() {
   parar();
 }
 
+// Avanza continuamente hacia adelante con la velocidad indicada
+void adelante(int velocidad) {
+  analogWrite(ENA, velocidad);
+  analogWrite(ENB, velocidad);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+}
+
 // Detiene ambos motores
 void parar() {
   analogWrite(ENA, 0);
@@ -128,22 +139,32 @@ long medirDistancia() {
   return duracion * 0.034 / 2;
 }
 
+// Escanea de manera suave y devuelve el ángulo con mayor distancia
+int escanearSuave() {
+  long maxDist = 0;
+  int mejorAng = 90;
+  for (int ang = 30; ang <= 150; ang += 5) {
+    sensorServo.write(ang);
+    delay(20);
+    long d = medirDistancia();
+    if (d > maxDist) {
+      maxDist = d;
+      mejorAng = ang;
+    }
+  }
+  sensorServo.write(90);
+  return mejorAng;
+}
+
 void modoAuto() {
   sensorServo.write(90);
-  delay(100);
   long d = medirDistancia();
   if (d > distanciaSegura) {
-    pasoAdel();
+    adelante(velAuto);
   } else {
     parar();
-    sensorServo.write(150);
-    delay(200);
-    long dIzq = medirDistancia();
-    sensorServo.write(30);
-    delay(200);
-    long dDer = medirDistancia();
-    sensorServo.write(90);
-    if (dIzq > dDer) {
+    int angulo = escanearSuave();
+    if (angulo < 90) {
       pasoIzq();
     } else {
       pasoDer();
