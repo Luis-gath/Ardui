@@ -169,6 +169,8 @@ void modoAuto() {
     } else {
       pasoDer();
     }
+    // Después de girar hacia la dirección libre, avanza nuevamente
+    adelante(velAuto);
   }
 }
 
